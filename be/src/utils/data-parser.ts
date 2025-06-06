@@ -13,7 +13,11 @@ const oid = (v: any, throwIfInvalid = true): ObjectId => {
     else
       return null;
   }
-  return new ObjectId(v)
+  try {
+    return new ObjectId(v)
+  } catch (e) {
+    throw new Error(`${e.message}. Input value: ${v}`)
+  }
 }
 
 /**
@@ -21,7 +25,7 @@ const oid = (v: any, throwIfInvalid = true): ObjectId => {
  * @param v
  * @param fallbackValue
  */
-const number = (v: any, fallbackValue: number): number => +v || fallbackValue;
+const num = (v: any, fallbackValue: number): number => +v || fallbackValue;
 
 /**
  * Parse any value to false, accept all falsy values such as 0, false, '' and also null, undefined, '0', 'false', 'False', 'FALSE', ..
@@ -35,7 +39,7 @@ const str = (v: any): string => (v && v.toString()) || "";
 
 export default {
   oid,
-  number,
+  num,
   bool,
   date,
   str
