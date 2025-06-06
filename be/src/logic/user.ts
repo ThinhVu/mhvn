@@ -130,6 +130,14 @@ export const updateUser = async (_id: ObjectId, fieldsToUpdate: any): Promise<IU
   return rs
 };
 
+export async function removeFcmTokenForDevice(uid: ObjectId, deviceId: string) {
+  await updateUser(uid, {
+    $unset: {
+      [`fcm.${deviceId}`]: 1
+    }
+  })
+}
+
 // delete account
 export const deleteAccountRequest = (_id: ObjectId, issueDate: Date): void => {
   Model.Users.updateOne({_id}, {$set: {deleteAccountRequest: {activated: true, issueDate}}})
