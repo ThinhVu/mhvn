@@ -26,6 +26,7 @@ export const envVar = z.object({
   SOCKET_IO_NOTIFY: z.string().optional(),
   SOCKET_IO_REDIS_ADAPTER_URL: z.string().optional(),
   SOCKET_IO_TRANSPORTS_METHOD: z.string().optional(),
+  TOMTOM_SEARCH_API_KEY: z.string().optional(),
   TRIGGER_SERVER_END_CALL_AFTER_MINUTES: z.string().optional(),
   USE_API_METRIC: z.string().optional(),
   USE_DEV_SERVER: z.string().optional(),
