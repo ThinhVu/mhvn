@@ -16,14 +16,14 @@ export default async function useNotification(parentRouter: Router) {
   router.get('/un-seen', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>) => {
-    return getUnseenNotifies(req.locals.user._id)
+    return getUnseenNotifies(req.locals.uid)
   }))
 
   router.post('/seen', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>) => {
     const {ids} = await req.json()
-    return seenNotifies(req.locals.user._id, _.map(ids, id => DataParser.oid(id)))
+    return seenNotifies(req.locals.uid, _.map(ids, id => DataParser.oid(id)))
   }))
 
   parentRouter.use('/notification', router)

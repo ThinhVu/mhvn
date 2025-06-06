@@ -293,7 +293,7 @@ export default async function useUser(parentRouter: Router) {
     middlewares: [requireUser, await rateLimitByIp({windowMs: m2ms(10), max: 60})]
   }, $<boolean>(async (req: Request<UserProps>, res) => {
     const {fcm, apn} = await req.json()
-    await updateUser(req.locals.user._id, {$pull: {fcm, apn}})
+    await updateUser(req.locals.uid, {$pull: {fcm, apn}})
     if (req.cookies['token'])
       res.clearCookie('token')
     return true
@@ -402,7 +402,7 @@ export default async function useUser(parentRouter: Router) {
     if (!vrf) throw new ApiError('E_009', 'email/phone not verified')
     await Model.Verifications.deleteOne({_id: vrf._id})
     const {value: user} = await Model.Users.findOneAndUpdate(
-      {_id: req.locals.user._id},
+      {_id: req.locals.uid},
       {$set: {phone, phoneVerified: true}},
       {returnDocument: 'after', includeResultMetadata: true}
     )
@@ -422,7 +422,7 @@ export default async function useUser(parentRouter: Router) {
     if (!vrf) throw new ApiError('E_009', 'email/phone not verified')
     await Model.Verifications.deleteOne({_id: vrf._id})
     const {value: user} = await Model.Users.findOneAndUpdate(
-      {_id: req.locals.user._id},
+      {_id: req.locals.uid},
       {$set: {email, emailVerified: true}},
       {returnDocument: 'after', includeResultMetadata: true}
     )
@@ -439,8 +439,8 @@ export default async function useUser(parentRouter: Router) {
     if (_.isEmpty(username)) throw new ApiError('E_012', 'missing user name')
     if (!isUsernameValid(username)) throw new ApiError('E_016', 'username invalid')
     if (await isUsernameHaveBeenUsed(username)) throw new ApiError('E_013', 'username has been used')
-    await Model.Users.updateOne({_id: req.locals.user._id}, {$set: {username}})
-    return {_id: req.locals.user._id, username}
+    await Model.Users.updateOne({_id: req.locals.uid}, {$set: {username}})
+    return {_id: req.locals.uid, username}
   }))
 
   router.put('/profile', {
@@ -474,7 +474,7 @@ export default async function useUser(parentRouter: Router) {
         change.$set[`notificationSetting.${k}`] = notificationSetting[k];
     }
     change.$set = _.omitBy(change.$set, _.isNil)
-    return updateUser(req.locals.user._id, change);
+    return updateUser(req.locals.uid, change);
   }));
 
   //endregion
@@ -487,7 +487,7 @@ export default async function useUser(parentRouter: Router) {
     ]
   }, $<IUser>(async (req: Request<UserProps>) => {
     const user: IUser = await Model.Users.findOne(
-      {_id: req.locals.user._id},
+      {_id: req.locals.uid},
       {projection: {password: 0}}
     )
     return user
@@ -497,9 +497,9 @@ export default async function useUser(parentRouter: Router) {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $<IPublicUserInfo | IUser>(async (req: Request<UserProps>) => {
     const userId = To.oid(req.path_parameters.id)
-    if (userId.toString() === req.locals.user._id.toString()) {
+    if (userId.toString() === req.locals.uid.toString()) {
       const user: IUser = await Model.Users.findOne(
-        {_id: req.locals.user._id},
+        {_id: req.locals.uid},
         {projection: {password: 0}}
       )
       return user
@@ -517,21 +517,21 @@ export default async function useUser(parentRouter: Router) {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>) => {
     const issueDate = dayjs(new Date()).add(14, 'day').toDate()
-    deleteAccountRequest(req.locals.user._id, issueDate)
+    deleteAccountRequest(req.locals.uid, issueDate)
     return issueDate
   }))
 
   router.post('/cancel-delete-account-request', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>) => {
-    cancelDeleteAccountRequest(req.locals.user._id)
+    cancelDeleteAccountRequest(req.locals.uid)
     return true
   }))
 
   router.delete('/email', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>, res) => {
-    const qry = {_id: req.locals.user._id}
+    const qry = {_id: req.locals.uid}
     const user = await Model.Users.findOne(qry)
     if (!user.phone || !user.phoneVerified) throw new ApiError('E_000', 'Email cannot blank')
     const {value: updatedUser} = await Model.Users.findOneAndUpdate(
@@ -547,7 +547,7 @@ export default async function useUser(parentRouter: Router) {
   router.delete('/phone', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>, res) => {
-    const qry = {_id: req.locals.user._id}
+    const qry = {_id: req.locals.uid}
     const user = await Model.Users.findOne(qry)
     if (!user.email || !user.emailVerified) throw new ApiError('E_000', 'Phone cannot blank')
     const {value: updatedUser} = await Model.Users.findOneAndUpdate(

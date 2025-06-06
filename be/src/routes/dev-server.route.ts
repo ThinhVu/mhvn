@@ -12,8 +12,6 @@ import {getRandomSubarray, randomNumberInRange} from "../utils/random-util";
 import {delay, m2ms} from "../utils/date-time-util";
 import {Model} from "../db/models";
 import {defaultUserInfo} from "../logic/user";
-import {sendApn, sendFcm, volatileNotifyUser} from "../logic/notification";
-import DataParser from "../utils/data-parser";
 import {IVerification, VrfType} from "../db/models/verification";
 
 async function initUser(uptimeByDay: number) {
@@ -97,7 +95,7 @@ export default async function useDevServer(parentRouter: Router) {
   router.get('/user/delete-account', {
     middlewares: [requireUser]
   }, $(async (req: Request<UserProps>) => {
-    return Model.Users.deleteOne({_id: req.locals.user._id})
+    return Model.Users.deleteOne({_id: req.locals.uid})
   }))
 
   router.get('/user/get-verification-code', $<IVerification>(async (req) => {
@@ -111,28 +109,6 @@ export default async function useDevServer(parentRouter: Router) {
       return Model.Verifications.findOne({target: email, type: VrfType.VerifyEmail});
     else
       return Model.Verifications.findOne({target: phone, type: VrfType.VerifyPhoneNr});
-  }))
-
-  router.post('/notification/echo', {
-    middlewares: [requireUser]
-  }, $(async (req: Request<UserProps>) => {
-    return volatileNotifyUser([req.locals.user._id], 'hello', {from: null, data: {hi: 'mom'}})
-  }))
-
-  router.post('/notification/volatile-notify', $(async (req: Request) => {
-    const {userIds, event, data} = await req.json()
-    const userObjectIds = _.map(userIds, id => DataParser.oid(id))
-    return volatileNotifyUser(userObjectIds, event, data)
-  }))
-
-  router.post('/notification/apn', $(async (req: Request) => {
-    const {token} = await req.json()
-    return await sendApn([token], {notification: {title: 'title', body: 'body'}, data: {age: 30, name: 'Josh'}})
-  }))
-
-  router.post('/notification/fcm', $(async (req: Request) => {
-    const {token} = await req.json()
-    return await sendFcm([token], {notification: {title: 'title', body: 'body'}, data: {age: 30, name: 'Josh'}})
   }))
 
   parentRouter.use('/dev-server', router)
