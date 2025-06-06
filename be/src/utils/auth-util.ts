@@ -22,7 +22,7 @@ export function parseAuthorization(req: Request): IAuthData {
          return {user: data.user, expired}
       }
    }
-   const data = jwt.verify(jwtToken, process.env.JWT_SECRET) as TokenPayload;
+   const data = jwt.verify(jwtToken, process.env.JWT_SECRET, {ignoreExpiration: true}) as TokenPayload;
    if (data) {
       if (process.env.PERF_BOOST) {
          tokenCache.set(jwtToken, data)
