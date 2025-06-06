@@ -1,8 +1,8 @@
 // /source/headers.ts
 // The header setting functions
 
-import type { Response } from 'hyper-express'
-import type { RateLimitInfo } from './types'
+import type {Response} from 'hyper-express'
+import type {RateLimitInfo} from './types'
 
 /**
  * Returns the number of seconds left for the window to reset. Uses `windowMs`
@@ -12,21 +12,21 @@ import type { RateLimitInfo } from './types'
  * @param windowMs {number | undefined} - The window length.
  */
 const getResetSeconds = (
-	resetTime?: Date,
-	windowMs?: number,
+  resetTime?: Date,
+  windowMs?: number,
 ): number | undefined => {
-	let resetSeconds: number | undefined = undefined // eslint-disable-line no-undef-init
-	if (resetTime) {
-		const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1000)
-		resetSeconds = Math.max(0, deltaSeconds)
-	} else if (windowMs) {
-		// This isn't really correct, but the field is required by the spec in `draft-7`,
-		// so this is the best we can do. The validator should have already logged a
-		// warning by this point.
-		resetSeconds = Math.ceil(windowMs / 1000)
-	}
+  let resetSeconds: number | undefined = undefined // eslint-disable-line no-undef-init
+  if (resetTime) {
+    const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1000)
+    resetSeconds = Math.max(0, deltaSeconds)
+  } else if (windowMs) {
+    // This isn't really correct, but the field is required by the spec in `draft-7`,
+    // so this is the best we can do. The validator should have already logged a
+    // warning by this point.
+    resetSeconds = Math.ceil(windowMs / 1000)
+  }
 
-	return resetSeconds
+  return resetSeconds
 }
 
 /**
@@ -36,23 +36,23 @@ const getResetSeconds = (
  * @param info {RateLimitInfo} - The rate limit info, used to set the headers.
  */
 export const setLegacyHeaders = (
-	response: Response,
-	info: RateLimitInfo,
+  response: Response,
+  info: RateLimitInfo,
 ): void => {
-	if (response.headersSent) return
+  if (response.headersSent) return
 
-	response.setHeader('X-RateLimit-Limit', info.limit.toString())
-	response.setHeader('X-RateLimit-Remaining', info.remaining.toString())
+  response.setHeader('X-RateLimit-Limit', info.limit.toString())
+  response.setHeader('X-RateLimit-Remaining', info.remaining.toString())
 
-	// If we have a resetTime, also provide the current date to help avoid
-	// issues with incorrect clocks.
-	if (info.resetTime instanceof Date) {
-		response.setHeader('Date', new Date().toUTCString())
-		response.setHeader(
-			'X-RateLimit-Reset',
-			Math.ceil(info.resetTime.getTime() / 1000).toString(),
-		)
-	}
+  // If we have a resetTime, also provide the current date to help avoid
+  // issues with incorrect clocks.
+  if (info.resetTime instanceof Date) {
+    response.setHeader('Date', new Date().toUTCString())
+    response.setHeader(
+      'X-RateLimit-Reset',
+      Math.ceil(info.resetTime.getTime() / 1000).toString(),
+    )
+  }
 }
 
 /**
@@ -64,22 +64,22 @@ export const setLegacyHeaders = (
  * @param windowMs {number} - The window length.
  */
 export const setDraft6Headers = (
-	response: Response,
-	info: RateLimitInfo,
-	windowMs: number,
+  response: Response,
+  info: RateLimitInfo,
+  windowMs: number,
 ): void => {
-	if (response.headersSent) return
+  if (response.headersSent) return
 
-	const windowSeconds = Math.ceil(windowMs / 1000)
-	const resetSeconds = getResetSeconds(info.resetTime)
+  const windowSeconds = Math.ceil(windowMs / 1000)
+  const resetSeconds = getResetSeconds(info.resetTime)
 
-	response.setHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
-	response.setHeader('RateLimit-Limit', info.limit.toString())
-	response.setHeader('RateLimit-Remaining', info.remaining.toString())
+  response.setHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
+  response.setHeader('RateLimit-Limit', info.limit.toString())
+  response.setHeader('RateLimit-Remaining', info.remaining.toString())
 
-	// Set this header only if the store returns a `resetTime`.
-	if (resetSeconds)
-		response.setHeader('RateLimit-Reset', resetSeconds.toString())
+  // Set this header only if the store returns a `resetTime`.
+  if (resetSeconds)
+    response.setHeader('RateLimit-Reset', resetSeconds.toString())
 }
 
 /**
@@ -91,20 +91,20 @@ export const setDraft6Headers = (
  * @param windowMs {number} - The window length.
  */
 export const setDraft7Headers = (
-	response: Response,
-	info: RateLimitInfo,
-	windowMs: number,
+  response: Response,
+  info: RateLimitInfo,
+  windowMs: number,
 ): void => {
-	if (response.headersSent) return
+  if (response.headersSent) return
 
-	const windowSeconds = Math.ceil(windowMs / 1000)
-	const resetSeconds = getResetSeconds(info.resetTime, windowMs)
+  const windowSeconds = Math.ceil(windowMs / 1000)
+  const resetSeconds = getResetSeconds(info.resetTime, windowMs)
 
-	response.setHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
-	response.setHeader(
-		'RateLimit',
-		`limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds!}`,
-	)
+  response.setHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
+  response.setHeader(
+    'RateLimit',
+    `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds!}`,
+  )
 }
 
 /**
@@ -115,12 +115,12 @@ export const setDraft7Headers = (
  * @param windowMs {number} - The window length.
  */
 export const setRetryAfterHeader = (
-	response: Response,
-	info: RateLimitInfo,
-	windowMs: number,
+  response: Response,
+  info: RateLimitInfo,
+  windowMs: number,
 ): void => {
-	if (response.headersSent) return
+  if (response.headersSent) return
 
-	const resetSeconds = getResetSeconds(info.resetTime, windowMs)
-	response.setHeader('Retry-After', resetSeconds!.toString())
+  const resetSeconds = getResetSeconds(info.resetTime, windowMs)
+  response.setHeader('Retry-After', resetSeconds!.toString())
 }

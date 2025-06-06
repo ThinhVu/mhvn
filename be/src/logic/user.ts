@@ -40,7 +40,10 @@ export const getUserPublicInfoByIds = async (ids: ObjectId[]): Promise<IPublicUs
 // validation
 export const isEmailValid = (email: string) => EmailRegex.test(email)
 export const isEmailInvalid = (email: string) => !isEmailValid(email)
-export const isEmailHaveBeenUsed = async (email: string): Promise<boolean> => (await Model.Users.countDocuments({email, emailVerified: true})) > 0;
+export const isEmailHaveBeenUsed = async (email: string): Promise<boolean> => (await Model.Users.countDocuments({
+  email,
+  emailVerified: true
+})) > 0;
 
 export const isValidPhoneNr = (phone: string) => {
   phone = _.trim(phone)
@@ -55,7 +58,10 @@ export const isValidPhoneNr = (phone: string) => {
     return false
   return true
 }
-export const isPhoneHaveBeenUsed = async (phone: string): Promise<boolean> => (await Model.Users.countDocuments({phone, phoneVerified: true})) > 0;
+export const isPhoneHaveBeenUsed = async (phone: string): Promise<boolean> => (await Model.Users.countDocuments({
+  phone,
+  phoneVerified: true
+})) > 0;
 
 export function isUsernameValid(username: string) {
   const hasSpace = _.indexOf(username, ' ') >= 0

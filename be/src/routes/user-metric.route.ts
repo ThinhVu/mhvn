@@ -19,10 +19,12 @@ export default async function useUserMetric(parentRouter: Router) {
     middlewares: [requireUser]
   }, $(async (req) => {
     const {from, to} = req.query_parameters
-    return Model.DailyActiveUsers.find({t: {
-      $gte: dayjs(from).toDate(),
-      $lte: dayjs(to).toDate()
-    }}).toArray()
+    return Model.DailyActiveUsers.find({
+      t: {
+        $gte: dayjs(from).toDate(),
+        $lte: dayjs(to).toDate()
+      }
+    }).toArray()
   }))
 
   router.get('/wau', {
@@ -37,10 +39,12 @@ export default async function useUserMetric(parentRouter: Router) {
     const {from, to} = req.query_parameters
 
 
-    return Model.WeeklyActiveUsers.find({t: {
-      $gte: dayjs(from).toDate(),
-      $lte: dayjs(to).toDate()
-    }}).toArray()
+    return Model.WeeklyActiveUsers.find({
+      t: {
+        $gte: dayjs(from).toDate(),
+        $lte: dayjs(to).toDate()
+      }
+    }).toArray()
   }))
 
   router.get('/mau', {
@@ -53,10 +57,12 @@ export default async function useUserMetric(parentRouter: Router) {
     middlewares: [requireUser]
   }, $(async (req) => {
     const {from, to} = req.query_parameters
-    return Model.MonthlyActiveUsers.find({t: {
-      $gte: dayjs(from).toDate(),
-      $lte: dayjs(to).toDate()
-    }}).toArray()
+    return Model.MonthlyActiveUsers.find({
+      t: {
+        $gte: dayjs(from).toDate(),
+        $lte: dayjs(to).toDate()
+      }
+    }).toArray()
   }))
 
   parentRouter.use('/user-metric', router)

@@ -18,10 +18,8 @@
   "E_016": "Invalid id.",
   "E_017": "Verification code expired",
   "E_018": "Wrong password. Please check again",
-
   "EmailVerification_Subject": "Your beFriend verification code",
   "EmailVerification_Content": "Welcome to beFriend,\n\nWe’ve received a register request from [{{email}}] . Please copy the following verification code to confirm it’s you. The code will be expired in 30 minutes, so please verify soon.\n\n{{code}}\n\nIf you haven’t make this request, please ignore this email.\nHope you have great time with beFriend!\n\nHappy messaging\nThe beFriend Team\n",
-
-  "ResetPassword_Subject":"Reset Password Request",
+  "ResetPassword_Subject": "Reset Password Request",
   "ResetPassword_Content": "Hey [{{user}}]\n\nWe received a request to reset your password. The reset password token is \"{{code}}\".\nIf you do not make this request, you can safely ignore this message."
 }

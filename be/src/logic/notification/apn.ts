@@ -15,12 +15,12 @@ import apn from 'apn'
 // }
 
 const apnOptions = {
-   token: {
-      key: "",
-      keyId: "",
-      teamId: ""
-   },
-   production: true
+  token: {
+    key: "",
+    keyId: "",
+    teamId: ""
+  },
+  production: true
 }
 
 const apnProvider = apnOptions.token?.key ? new apn.Provider(apnOptions) : null

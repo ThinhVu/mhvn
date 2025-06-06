@@ -1,8 +1,13 @@
 // /source/types.ts
 // All the types used by this package
 
-import type { Request, Response, MiddlewareNext as NextFunction, MiddlewareHandler as RequestHandler } from 'hyper-express'
-import type { Validations } from './validations'
+import type {
+  Request,
+  Response,
+  MiddlewareNext as NextFunction,
+  MiddlewareHandler as RequestHandler
+} from 'hyper-express'
+import type {Validations} from './validations'
 
 /**
  * Callback that fires when a client's hit counter is incremented.
@@ -12,9 +17,9 @@ import type { Validations } from './validations'
  * @param resetTime {Date | undefined} - The time when the counter resets.
  */
 export type IncrementCallback = (
-	error: Error | undefined,
-	totalHits: number,
-	resetTime: Date | undefined,
+  error: Error | undefined,
+  totalHits: number,
+  resetTime: Date | undefined,
 ) => void
 
 /**
@@ -27,8 +32,8 @@ export type IncrementCallback = (
  * @returns {T} - The value needed.
  */
 export type ValueDeterminingMiddleware<T> = (
-	request: Request,
-	response: Response,
+  request: Request,
+  response: Response,
 ) => T | Promise<T>
 
 /**
@@ -40,9 +45,9 @@ export type ValueDeterminingMiddleware<T> = (
  * @param optionsUsed {Options} - The options used to set up the middleware.
  */
 export type RateLimitExceededEventHandler = (
-	request: Request,
-	response: Response,
-	optionsUsed: Options,
+  request: Request,
+  response: Response,
+  optionsUsed: Options,
 ) => Promise<void>
 
 /**
@@ -55,9 +60,9 @@ export type RateLimitExceededEventHandler = (
  * @param optionsUsed {Options} - The options used to set up the middleware.
  */
 export type RateLimitReachedEventHandler = (
-	request: Request,
-	response: Response,
-	optionsUsed: Options,
+  request: Request,
+  response: Response,
+  optionsUsed: Options,
 ) => void
 
 /**
@@ -67,8 +72,8 @@ export type RateLimitReachedEventHandler = (
  * @property resetTime {Date | undefined} - The time when the counter resets.
  */
 export type ClientRateLimitInfo = {
-	totalHits: number
-	resetTime: Date | undefined
+  totalHits: number
+  resetTime: Date | undefined
 }
 
 export type IncrementResponse = ClientRateLimitInfo
@@ -77,26 +82,26 @@ export type IncrementResponse = ClientRateLimitInfo
  * A modified Express request handler with the rate limit functions.
  */
 export type RateLimitRequestHandler = RequestHandler & {
-	/**
-	 * Method to reset a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 */
-	resetKey: (key: string) => void
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   */
+  resetKey: (key: string) => void
 
-	/**
-	 * Method to fetch a client's hit count and reset time.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 *
-	 * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
-	 */
-	getKey: (
-		key: string,
-	) =>
-		| Promise<ClientRateLimitInfo | undefined>
-		| ClientRateLimitInfo
-		| undefined
+  /**
+   * Method to fetch a client's hit count and reset time.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
+   */
+  getKey: (
+    key: string,
+  ) =>
+    | Promise<ClientRateLimitInfo | undefined>
+    | ClientRateLimitInfo
+    | undefined
 }
 
 /**
@@ -105,108 +110,108 @@ export type RateLimitRequestHandler = RequestHandler & {
  * @deprecated 6.x - Implement the `Store` interface instead.
  */
 export type LegacyStore = {
-	/**
-	 * Method to increment a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 * @param callback {IncrementCallback} - The callback to call once the counter is incremented.
-	 */
-	incr: (key: string, callback: IncrementCallback) => void
+  /**
+   * Method to increment a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   * @param callback {IncrementCallback} - The callback to call once the counter is incremented.
+   */
+  incr: (key: string, callback: IncrementCallback) => void
 
-	/**
-	 * Method to decrement a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 */
-	decrement: (key: string) => void
+  /**
+   * Method to decrement a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   */
+  decrement: (key: string) => void
 
-	/**
-	 * Method to reset a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 */
-	resetKey: (key: string) => void
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   */
+  resetKey: (key: string) => void
 
-	/**
-	 * Method to reset everyone's hit counter.
-	 */
-	resetAll?: () => void
+  /**
+   * Method to reset everyone's hit counter.
+   */
+  resetAll?: () => void
 }
 
 /**
  * An interface that all hit counter stores must implement.
  */
 export type Store = {
-	/**
-	 * Method that initializes the store, and has access to the options passed to
-	 * the middleware too.
-	 *
-	 * @param options {Options} - The options used to setup the middleware.
-	 */
-	init?: (options: Options) => void
+  /**
+   * Method that initializes the store, and has access to the options passed to
+   * the middleware too.
+   *
+   * @param options {Options} - The options used to setup the middleware.
+   */
+  init?: (options: Options) => void
 
-	/**
-	 * Method to fetch a client's hit count and reset time.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 *
-	 * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
-	 */
-	get?: (
-		key: string,
-	) =>
-		| Promise<ClientRateLimitInfo | undefined>
-		| ClientRateLimitInfo
-		| undefined
+  /**
+   * Method to fetch a client's hit count and reset time.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
+   */
+  get?: (
+    key: string,
+  ) =>
+    | Promise<ClientRateLimitInfo | undefined>
+    | ClientRateLimitInfo
+    | undefined
 
-	/**
-	 * Method to increment a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 *
-	 * @returns {IncrementResponse | undefined} - The number of hits and reset time for that client.
-	 */
-	increment: (key: string) => Promise<IncrementResponse> | IncrementResponse
+  /**
+   * Method to increment a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {IncrementResponse | undefined} - The number of hits and reset time for that client.
+   */
+  increment: (key: string) => Promise<IncrementResponse> | IncrementResponse
 
-	/**
-	 * Method to decrement a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 */
-	decrement: (key: string) => Promise<void> | void
+  /**
+   * Method to decrement a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   */
+  decrement: (key: string) => Promise<void> | void
 
-	/**
-	 * Method to reset a client's hit counter.
-	 *
-	 * @param key {string} - The identifier for a client.
-	 */
-	resetKey: (key: string) => Promise<void> | void
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   */
+  resetKey: (key: string) => Promise<void> | void
 
-	/**
-	 * Method to reset everyone's hit counter.
-	 */
-	resetAll?: () => Promise<void> | void
+  /**
+   * Method to reset everyone's hit counter.
+   */
+  resetAll?: () => Promise<void> | void
 
-	/**
-	 * Method to shutdown the store, stop timers, and release all resources.
-	 */
-	shutdown?: () => Promise<void> | void
+  /**
+   * Method to shutdown the store, stop timers, and release all resources.
+   */
+  shutdown?: () => Promise<void> | void
 
-	/**
-	 * Flag to indicate that keys incremented in one instance of this store can
-	 * not affect other instances. Typically false if a database is used, true for
-	 * MemoryStore.
-	 *
-	 * Used to help detect double-counting misconfigurations.
-	 */
-	localKeys?: boolean
+  /**
+   * Flag to indicate that keys incremented in one instance of this store can
+   * not affect other instances. Typically false if a database is used, true for
+   * MemoryStore.
+   *
+   * Used to help detect double-counting misconfigurations.
+   */
+  localKeys?: boolean
 
-	/**
-	 * Optional value that the store prepends to keys
-	 *
-	 * Used by the double-count check to avoid false-positives when a key is counted twice, but with different prefixes
-	 */
-	prefix?: string
+  /**
+   * Optional value that the store prepends to keys
+   *
+   * Used by the double-count check to avoid false-positives when a key is counted twice, but with different prefixes
+   */
+  prefix?: string
 }
 
 export type DraftHeadersVersion = 'draft-6' | 'draft-7'
@@ -218,146 +223,146 @@ export type DraftHeadersVersion = 'draft-6' | 'draft-7'
  * and `default`.
  */
 export type EnabledValidations = {
-	[key in keyof Omit<Validations, 'enabled' | 'disable'> | 'default']?: boolean
+  [key in keyof Omit<Validations, 'enabled' | 'disable'> | 'default']?: boolean
 }
 
 /**
  * The configuration options for the rate limiter.
  */
 export type Options = {
-	/**
-	 * How long we should remember the requests.
-	 *
-	 * Defaults to `60000` ms (= 1 minute).
-	 */
-	windowMs: number
+  /**
+   * How long we should remember the requests.
+   *
+   * Defaults to `60000` ms (= 1 minute).
+   */
+  windowMs: number
 
-	/**
-	 * The maximum number of connections to allow during the `window` before
-	 * rate limiting the client.
-	 *
-	 * Can be the limit itself as a number or express middleware that parses
-	 * the request and then figures out the limit.
-	 *
-	 * Defaults to `5`.
-	 */
-	limit: number | ValueDeterminingMiddleware<number>
+  /**
+   * The maximum number of connections to allow during the `window` before
+   * rate limiting the client.
+   *
+   * Can be the limit itself as a number or express middleware that parses
+   * the request and then figures out the limit.
+   *
+   * Defaults to `5`.
+   */
+  limit: number | ValueDeterminingMiddleware<number>
 
-	/**
-	 * The response body to send back when a client is rate limited.
-	 *
-	 * Defaults to `'Too many requests, please try again later.'`
-	 */
-	message: any | ValueDeterminingMiddleware<any>
+  /**
+   * The response body to send back when a client is rate limited.
+   *
+   * Defaults to `'Too many requests, please try again later.'`
+   */
+  message: any | ValueDeterminingMiddleware<any>
 
-	/**
-	 * The HTTP status code to send back when a client is rate limited.
-	 *
-	 * Defaults to `HTTP 429 Too Many Requests` (RFC 6585).
-	 */
-	statusCode: number
+  /**
+   * The HTTP status code to send back when a client is rate limited.
+   *
+   * Defaults to `HTTP 429 Too Many Requests` (RFC 6585).
+   */
+  statusCode: number
 
-	/**
-	 * Whether to send `X-RateLimit-*` headers with the rate limit and the number
-	 * of requests.
-	 *
-	 * Defaults to `true` (for backward compatibility).
-	 */
-	legacyHeaders: boolean
+  /**
+   * Whether to send `X-RateLimit-*` headers with the rate limit and the number
+   * of requests.
+   *
+   * Defaults to `true` (for backward compatibility).
+   */
+  legacyHeaders: boolean
 
-	/**
-	 * Whether to enable support for the standardized rate limit headers (`RateLimit-*`).
-	 *
-	 * Defaults to `false` (for backward compatibility, but its use is recommended).
-	 */
-	standardHeaders: boolean | DraftHeadersVersion
+  /**
+   * Whether to enable support for the standardized rate limit headers (`RateLimit-*`).
+   *
+   * Defaults to `false` (for backward compatibility, but its use is recommended).
+   */
+  standardHeaders: boolean | DraftHeadersVersion
 
-	/**
-	 * The name of the property on the request object to store the rate limit info.
-	 *
-	 * Defaults to `rateLimit`.
-	 */
-	requestPropertyName: string
+  /**
+   * The name of the property on the request object to store the rate limit info.
+   *
+   * Defaults to `rateLimit`.
+   */
+  requestPropertyName: string
 
-	/**
-	 * If `true`, the library will (by default) skip all requests that have a 4XX
-	 * or 5XX status.
-	 *
-	 * Defaults to `false`.
-	 */
-	skipFailedRequests: boolean
+  /**
+   * If `true`, the library will (by default) skip all requests that have a 4XX
+   * or 5XX status.
+   *
+   * Defaults to `false`.
+   */
+  skipFailedRequests: boolean
 
-	/**
-	 * If `true`, the library will (by default) skip all requests that have a
-	 * status code less than 400.
-	 *
-	 * Defaults to `false`.
-	 */
-	skipSuccessfulRequests: boolean
+  /**
+   * If `true`, the library will (by default) skip all requests that have a
+   * status code less than 400.
+   *
+   * Defaults to `false`.
+   */
+  skipSuccessfulRequests: boolean
 
-	/**
-	 * Method to generate custom identifiers for clients.
-	 *
-	 * By default, the client's IP address is used.
-	 */
-	keyGenerator: ValueDeterminingMiddleware<string>
+  /**
+   * Method to generate custom identifiers for clients.
+   *
+   * By default, the client's IP address is used.
+   */
+  keyGenerator: ValueDeterminingMiddleware<string>
 
-	/**
-	 * Express request handler that sends back a response when a client is
-	 * rate-limited.
-	 *
-	 * By default, sends back the `statusCode` and `message` set via the options.
-	 */
-	handler: RateLimitExceededEventHandler
+  /**
+   * Express request handler that sends back a response when a client is
+   * rate-limited.
+   *
+   * By default, sends back the `statusCode` and `message` set via the options.
+   */
+  handler: RateLimitExceededEventHandler
 
-	/**
-	 * Method (in the form of middleware) to determine whether or not this request
-	 * counts towards a client's quota.
-	 *
-	 * By default, skips no requests.
-	 */
-	skip: ValueDeterminingMiddleware<boolean>
+  /**
+   * Method (in the form of middleware) to determine whether or not this request
+   * counts towards a client's quota.
+   *
+   * By default, skips no requests.
+   */
+  skip: ValueDeterminingMiddleware<boolean>
 
-	/**
-	 * Method to determine whether or not the request counts as 'succesful'. Used
-	 * when either `skipSuccessfulRequests` or `skipFailedRequests` is set to true.
-	 *
-	 * By default, requests with a response status code less than 400 are considered
-	 * successful.
-	 */
-	requestWasSuccessful: ValueDeterminingMiddleware<boolean>
+  /**
+   * Method to determine whether or not the request counts as 'succesful'. Used
+   * when either `skipSuccessfulRequests` or `skipFailedRequests` is set to true.
+   *
+   * By default, requests with a response status code less than 400 are considered
+   * successful.
+   */
+  requestWasSuccessful: ValueDeterminingMiddleware<boolean>
 
-	/**
-	 * The `Store` to use to store the hit count for each client.
-	 *
-	 * By default, the built-in `MemoryStore` will be used.
-	 */
-	store: Store | LegacyStore
+  /**
+   * The `Store` to use to store the hit count for each client.
+   *
+   * By default, the built-in `MemoryStore` will be used.
+   */
+  store: Store | LegacyStore
 
-	/**
-	 * The list of validation checks that should run.
-	 */
-	validate: boolean | EnabledValidations
+  /**
+   * The list of validation checks that should run.
+   */
+  validate: boolean | EnabledValidations
 
-	/**
-	 * Whether to send `X-RateLimit-*` headers with the rate limit and the number
-	 * of requests.
-	 *
-	 * @deprecated 6.x - This option was renamed to `legacyHeaders`.
-	 */
-	headers?: boolean
+  /**
+   * Whether to send `X-RateLimit-*` headers with the rate limit and the number
+   * of requests.
+   *
+   * @deprecated 6.x - This option was renamed to `legacyHeaders`.
+   */
+  headers?: boolean
 
-	/**
-	 * The maximum number of connections to allow during the `window` before
-	 * rate limiting the client.
-	 *
-	 * Can be the limit itself as a number or express middleware that parses
-	 * the request and then figures out the limit.
-	 *
-	 * @deprecated 7.x - This option was renamed to `limit`. However, it will not
-	 * be removed from the library in the foreseeable future.
-	 */
-	max?: number | ValueDeterminingMiddleware<number>
+  /**
+   * The maximum number of connections to allow during the `window` before
+   * rate limiting the client.
+   *
+   * Can be the limit itself as a number or express middleware that parses
+   * the request and then figures out the limit.
+   *
+   * @deprecated 7.x - This option was renamed to `limit`. However, it will not
+   * be removed from the library in the foreseeable future.
+   */
+  max?: number | ValueDeterminingMiddleware<number>
 }
 
 /**
@@ -365,7 +370,7 @@ export type Options = {
  * rate limit.
  */
 export type AugmentedRequest = Request & {
-	[key: string]: RateLimitInfo
+  [key: string]: RateLimitInfo
 }
 
 /**
@@ -373,16 +378,16 @@ export type AugmentedRequest = Request & {
  * Express request object.
  */
 export type RateLimitInfo = {
-	limit: number
-	used: number
-	remaining: number
-	resetTime: Date | undefined
+  limit: number
+  used: number
+  remaining: number
+  resetTime: Date | undefined
 
-	/**
-	 * NOTE: The `current` field is deprecated and renamed to `used`. The library
-	 * will still set the `current` property, and you can still access it, but it
-	 * will be hidden from iteration and JSON.stringify calls. See:
-	 * https://github.com/ThinhVu/hyper-express-rate-limit/discussions/372#discussioncomment-6915685
-	 */
-	// current: number
+  /**
+   * NOTE: The `current` field is deprecated and renamed to `used`. The library
+   * will still set the `current` property, and you can still access it, but it
+   * will be hidden from iteration and JSON.stringify calls. See:
+   * https://github.com/ThinhVu/hyper-express-rate-limit/discussions/372#discussioncomment-6915685
+   */
+  // current: number
 }

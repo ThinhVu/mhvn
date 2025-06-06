@@ -7,13 +7,13 @@ import {ObjectId} from "mongodb";
  * @param throwIfInvalid if true, an Error will be thrown. Otherwise, null will be returned.
  */
 const objectId = (v: any, throwIfInvalid = true): ObjectId => {
-   if (!v) {
-      if (throwIfInvalid)
-         throw new Error("Invalid object id")
-      else
-         return null;
-   }
-   return new ObjectId(v)
+  if (!v) {
+    if (throwIfInvalid)
+      throw new Error("Invalid object id")
+    else
+      return null;
+  }
+  return new ObjectId(v)
 }
 
 /**
@@ -34,9 +34,9 @@ const date = (v: any): Date => dayjs(v).toDate();
 const str = (v: any): string => (v && v.toString()) || "";
 
 export default {
-   objectId,
-   number,
-   bool,
-   date,
-   str
+  objectId,
+  number,
+  bool,
+  date,
+  str
 }

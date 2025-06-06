@@ -57,21 +57,25 @@ export default async function useUser(parentRouter: Router) {
         subject: i18nMessage["EmailVerification_Subject"],
         content: i18nMessage["EmailVerification_Content"].replace("{{email}}", email).replace("{{code}}", code)
       }))
-      
-      await Model.Verifications.updateOne({target: email}, {$set: {
+
+      await Model.Verifications.updateOne({target: email}, {
+        $set: {
           type: VrfType.VerifyEmail,
           code,
           issueDate,
           expiredDate
-        }}, {upsert: true})
+        }
+      }, {upsert: true})
     } else {
       await sendOTP(phone, code)
-      await Model.Verifications.updateOne({target: phone}, {$set: {
+      await Model.Verifications.updateOne({target: phone}, {
+        $set: {
           type: VrfType.VerifyPhoneNr,
           code,
           issueDate,
           expiredDate
-        }}, {upsert: true})
+        }
+      }, {upsert: true})
     }
     return {issueDate, expiredDate}
   }
@@ -89,21 +93,25 @@ export default async function useUser(parentRouter: Router) {
       await Model.Verifications.updateOne({
         type: VrfType.ResetPasswordByEmail,
         target: email,
-      }, {$set: {
+      }, {
+        $set: {
           code,
           issueDate,
           expiredDate
-        }}, {upsert: true})
+        }
+      }, {upsert: true})
     } else {
       await sendOTP(phone, code)
       await Model.Verifications.updateOne({
         type: VrfType.ResetPasswordByPhone,
         target: phone,
-      }, {$set: {
+      }, {
+        $set: {
           code,
           issueDate,
           expiredDate
-        }}, {upsert: true})
+        }
+      }, {upsert: true})
     }
     return {issueDate, expiredDate}
   };
@@ -179,8 +187,8 @@ export default async function useUser(parentRouter: Router) {
     validatePassword(password)
     if (adminCode !== process.env.ADMIN_CODE) {
       const qry = (email
-        ? {type: VrfType.VerifyEmail, target: email, code}
-        : {type: VrfType.VerifyPhoneNr, target: phone, code}
+          ? {type: VrfType.VerifyEmail, target: email, code}
+          : {type: VrfType.VerifyPhoneNr, target: phone, code}
       )
       const vrf = await Model.Verifications.findOne(qry)
       if (!vrf)
@@ -478,7 +486,7 @@ export default async function useUser(parentRouter: Router) {
       await rateLimitByUser({windowMs: m2ms(10), max: 60})
     ]
   }, $<IUser>(async (req: Request<UserProps>) => {
-    const user : IUser = await Model.Users.findOne(
+    const user: IUser = await Model.Users.findOne(
       {_id: req.locals.user._id},
       {projection: {password: 0}}
     )

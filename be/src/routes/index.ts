@@ -14,21 +14,21 @@ import useAppMetrics from './app-metric.route'
 import {Router} from "hyper-express";
 
 export default async function useRoutes(app) {
-   await useHmmApp(app)
-   await useMetrics(app)
+  await useHmmApp(app)
+  await useMetrics(app)
 
-   const router = new Router()
-   await useHealthCheck(router)
-   await useDevServer(router)
-   await useI18n(router)
-   await useUserMetric(router)
-   await useAdmin(router)
-   await useFile(router)
-   await useFolder(router)
-   await useKv(router)
-   await useNotification(router)
-   await useUser(router)
-   await useAppMetrics(router)
+  const router = new Router()
+  await useHealthCheck(router)
+  await useDevServer(router)
+  await useI18n(router)
+  await useUserMetric(router)
+  await useAdmin(router)
+  await useFile(router)
+  await useFolder(router)
+  await useKv(router)
+  await useNotification(router)
+  await useUser(router)
+  await useAppMetrics(router)
 
-   app.use('/', router)
+  app.use('/', router)
 }

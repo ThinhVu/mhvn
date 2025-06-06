@@ -1,6 +1,6 @@
 import rateLimit, {Options} from '../libs/rate-limit'
 import {RedisStore} from "../libs/rate-limit-redis";
-import { createClient } from 'redis';
+import {createClient} from 'redis';
 import uuid from 'time-uuid';
 
 let redisClient, initialized;

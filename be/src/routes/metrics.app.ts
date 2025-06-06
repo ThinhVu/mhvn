@@ -1,7 +1,7 @@
-import { collectDefaultMetrics, register } from 'prom-client';
+import {collectDefaultMetrics, register} from 'prom-client';
 import {Request, Response} from "hyper-express";
 
-export default async function(app) {
+export default async function (app) {
   console.log('[app-route] metrics')
   collectDefaultMetrics();
 
