@@ -13,6 +13,7 @@ interface IAuthUser {
 
 export interface UserProps {
   user: IAuthUser
+  uid: ObjectId
 }
 
 export function requireAdmin(req: Request<UserProps>, res: Response, next: MiddlewareNext) {
@@ -27,10 +28,15 @@ export function requireAdmin(req: Request<UserProps>, res: Response, next: Middl
       email: admin.email,
       password: admin.password
     }
-    if (req.locals)
+    if (req.locals) {
       req.locals.user = authUser
-    else
-      req.locals = {user: authUser}
+      req.locals.uid = authUser._id
+    } else {
+      req.locals = {
+        user: authUser,
+        uid: authUser._id
+      }
+    }
     next()
   }).catch(e => next(new ApiError("E_000", "Invalid admin", 401)))
 }
@@ -41,11 +47,13 @@ export function requireUser(req: Request<UserProps>, res: Response, next: Middle
     next(new ApiError("E_000", "Invalid user", 401))
     return
   }
-  const authUser = {_id: To.oid(user._id)}
-  if (req.locals)
-    req.locals.user = authUser
-  else
-    req.locals = {user: authUser}
+  const uid = To.oid(user._id)
 
+  if (req.locals) {
+    req.locals.user = {_id: uid}
+    req.locals.uid = uid
+  } else {
+    req.locals = {user: {_id: uid}, uid: uid}
+  }
   next()
 }
