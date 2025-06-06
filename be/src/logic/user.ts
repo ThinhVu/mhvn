@@ -26,6 +26,7 @@ const userPublicInfoFields = {
   fullName: 1, username: 1, email: 1, phone: 1, emailVerified: 1, phoneVerified: 1, isOnline: 1,
 };
 export const getUserPublicInfo = (userInfo: IUser): IPublicUserInfo => {
+  // @ts-ignore
   return _.pick(userInfo, Object.keys(userPublicInfoFields))
 }
 
