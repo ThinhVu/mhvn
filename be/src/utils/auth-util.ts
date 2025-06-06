@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {Request} from "hyper-express";
 import {IUser} from "../db/models/user";
+import {getLogger} from "./logger";
 
 export interface IAuthData {
   user: Record<string, any>,
@@ -22,13 +23,18 @@ export function parseAuthorization(req: Request): IAuthData {
       return {user: data.user, expired}
     }
   }
-  const data = jwt.verify(jwtToken, process.env.JWT_SECRET, {ignoreExpiration: true}) as TokenPayload;
-  if (data) {
-    if (process.env.PERF_BOOST) {
-      tokenCache.set(jwtToken, data)
+  try {
+    const data = jwt.verify(jwtToken, process.env.JWT_SECRET, {ignoreExpiration: true}) as TokenPayload;
+    if (data) {
+      if (process.env.PERF_BOOST) {
+        tokenCache.set(jwtToken, data)
+      }
+      return {user: data.user, expired: Date.now() > data.exp * 1000}
+    } else {
+      return {user: null, expired: null}
     }
-    return {user: data.user, expired: Date.now() > data.exp * 1000}
-  } else {
+  } catch (e) {
+    getLogger().error("Invalid token", {fn: 'verifyAuthorization', token: jwtToken});
     return {user: null, expired: null}
   }
 }
