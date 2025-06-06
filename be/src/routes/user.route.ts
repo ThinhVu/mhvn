@@ -453,7 +453,7 @@ export default async function useUser(parentRouter: Router) {
       fcm, apn
     } = await req.json();
     if (fullName) validateFullName(fullName);
-    let change = {
+    let change: any = {
       $set: {
         avatar, fullName, gender,
         birthday: birthday && dayjs(birthday).toDate(),
