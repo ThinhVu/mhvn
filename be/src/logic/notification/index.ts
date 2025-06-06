@@ -1,22 +1,33 @@
 import _ from 'lodash';
 import {ObjectId} from "mongodb";
 import {INotification} from "../../db/models/notification";
-import fcm from './fcm';
-import {messaging} from 'firebase-admin'
-import MulticastMessage = messaging.MulticastMessage;
-import Notification = messaging.Notification;
-import {AppEvents} from "../../constants/app-events";
-import {getLogger} from "../../utils/logger";
-import apn from "apn";
-import apnProvider from "./apn";
 import {Model} from "../../db/models";
+import {buildNotification} from "./notification-builder";
+import {INotificationData} from "../../constants/app-types";
+import {sendFcmWithRetry} from "./fcm";
+import {IUser} from "../../db/models/user";
 
+export const getNotifications = async (uid: ObjectId, p?: number): Promise<any> => {
+  p = +p || 1
+  const itemsPerPage = 20;
+  return Model.Notifications.find({to: uid}).sort({at: -1}).skip(Math.min(+p - 1, 0) * itemsPerPage).limit(itemsPerPage).toArray()
+}
+export const getUnseenNotifies = async (userId: ObjectId): Promise<any> => {
+  return Model.Notifications.find({to: userId, seen: false}).sort({at: -1}).toArray()
+}
 export const seenNotifies = async (userId: ObjectId, notifyIds: ObjectId[]) => {
-  return Model.Notifications.deleteMany({_id: {$in: notifyIds}, to: userId})
+  return Model.Notifications.updateMany({_id: {$in: notifyIds}, to: userId}, {$set: {seen: true}})
 }
 
-export const getUnseenNotifies = async (userId: ObjectId): Promise<any> => {
-  return Model.Notifications.find({to: userId, seen: false}).toArray()
+export const persistentNotifyUser = async (to: ObjectId[], event: string, data: INotificationData): Promise<void> => {
+  const noti = await saveNotify(to, event, data)
+  const notifyId = noti._id.toString()
+  await sendNotifyViaFcm(notifyId, to, event, data)
+  await sendNotifyViaSocket(notifyId, to, event, data)
+}
+export const volatileNotifyUser = async (to: ObjectId[], event: string, data: INotificationData): Promise<void> => {
+  await sendNotifyViaFcm("", to, event, data)
+  await sendNotifyViaSocket("", to, event, data)
 }
 
 export const saveNotify = async (to: ObjectId[], event: string, metadata: any): Promise<INotification> => {
@@ -25,166 +36,105 @@ export const saveNotify = async (to: ObjectId[], event: string, metadata: any): 
   noti._id = insertedId
   return noti
 }
-
-export const notifyUser = async (to: ObjectId[], event: string, data: INotificationData) => {
-  const noti = await saveNotify(to, event, data)
-  const notifyId = noti._id.toString()
-  return notify(notifyId, to, event, data)
-}
-
-type INotificationData = {
-  from?: ObjectId | undefined,
-  data?: any
-}
-export const volatileNotifyUser = async (to: ObjectId[], event: string, data: INotificationData) => {
-  return notify("", to, event, data)
-}
-
-const notificationBuilder = {
-  [AppEvents.SYSTEM_NOTIFICATION]: async (payload: INotificationData) => {
-    const {from, data} = payload
-    console.log('notificationBuilder', AppEvents.SYSTEM_NOTIFICATION, from, data)
-    return {
-      title: "System notification",
-      body: "Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups."
-    }
-  },
-}
-
-// https://firebase.google.com/docs/cloud-messaging/send-message
-export async function sendFcm(tokens: string[], {notification, data}: { notification: Notification, data }) {
-  if (!tokens || !tokens.length)
-    return
-  const message: MulticastMessage = {
-    tokens,
-    notification,
-    data,
-    apns: {
-      headers: {
-        "apns-priority": "5",
-      },
-      payload: {
-        aps: {
-          'content-available': 1
-        }
-      }
-    },
-    android: {
-      priority: 'high'
-    },
-    webpush: {
-      headers: {
-        TTL: "86400",
-        Urgency: "high"
-      }
-    }
-  }
-  const result = await fcm.sendEachForMulticast(message)
-  const failedSends = result.responses.filter(r => !r.success)
-  if (!_.isEmpty(failedSends)) {
-    // TODO: Remove out-dated token
-    console.log('[app-notification]', 'failed send', failedSends.map(fe => fe.error.message).join('\n'))
-  }
-  return result
-}
-
-export async function sendApn(tokens: string[], {notification, data}) {
-  if (!apnProvider) return
-  if (!tokens || !tokens.length) return
-
-  const note = new apn.Notification();
-  note.alert = notification?.title
-  // @ts-ignore
-  note.body = notification?.body
-  note.payload = {...data, ...notification}
-  note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-  note.topic = 'com.mevn.api';
-  // @ts-ignore
-  note.mutableContent = 1;
-  // @ts-ignore
-  note.category = 'MevnNotification'
-  return apnProvider.send(note, tokens)
-}
-
-async function buildNotification(event: string, data: INotificationData) {
-  if (notificationBuilder[event])
-    return notificationBuilder[event](data)
-  return undefined
-}
-
-async function notify(
-  notifyId: string,
-  to: ObjectId[],
-  event: string,
-  data: INotificationData) {
-  let users = await Model.Users.find({_id: {$in: to}, 'notificationSetting.allow': true}).toArray()
-  if (_.isEmpty(users)) return
-  let _3rdSNS = []
+export const getNotificationUsers = async (to: ObjectId[], event: string, notificationData: INotificationData) => {
+  const usersFromIds = await Model.Users.find({_id: {$in: to}}).toArray();
+  const notificationUsers = usersFromIds.filter(user => user?.notificationSetting?.allow);
+  let finalUsers: Array<IUser>;
   switch (event) {
-    case AppEvents.SYSTEM_NOTIFICATION:
-      _3rdSNS = users.filter(user => user.notificationSetting?.systemNotification)
-      break;
     default:
-      _3rdSNS = users
+      finalUsers = notificationUsers
       break;
   }
-
-  const notification = await buildNotification(event, data)
-
-  const response: any = {
-    fcm: [],
-    apn: []
-  };
-  const compactFlattenFcm: string[] = _.compact(_.flatten(_3rdSNS.map(u => u.fcm)))
-  const fcmTokens = _.filter(compactFlattenFcm, (fcm: string) => fcm.length > 10)
-  const payload = {
-    notification,
-    data: {
-      event,
-      notifyId,
-      data: JSON.stringify(data)
+  return finalUsers
+}
+export const getUniqFcmTokens = (users: IUser[]) => {
+  const compactUniqFlattenFcm: string[] =
+    _.compact(
+      _.uniq(
+        _.flatten(
+          users.map(u => Object.values(u.fcm || {}))
+        )
+      )
+    )
+  return _.filter(compactUniqFlattenFcm, (fcm: string) => fcm.length > 10)
+}
+export const getTokenUserIdMap = (users: IUser[]): Record<string, { uid: ObjectId, deviceId: string }> => {
+  const rs: Record<string, { uid: ObjectId, deviceId: string }> = {}
+  for (const user of users) {
+    const uid = user._id;
+    const fcm = user.fcm;
+    if (!fcm)
+      continue;
+    const deviceIds = Object.keys(fcm);
+    for (const deviceId of deviceIds) {
+      const token = fcm[deviceId]
+      rs[token] = {
+        uid: uid,
+        deviceId: deviceId,
+      }
     }
   }
-  try {
-    if (fcmTokens.length)
-      response.fcm = await sendFcm(fcmTokens, payload)
-  } catch (e) {
-    getLogger().error(e.message, {fn: 'notification::fcm', event, fcmTokens, payload})
-  }
+  return rs;
+}
 
-  try {
-    const compactFlattenApn = _.compact(_.flatten(_3rdSNS.map(u => u.apn)))
-    const apnTokens = _.filter(compactFlattenApn, (apn: string) => apn.length > 10)
-    if (apnTokens.length) {
-      response.apn = await sendApn(apnTokens, {
-        notification,
-        data: {
-          event,
-          notifyId,
-          data: JSON.stringify(data)
-        }
+export const sendNotifyViaFcm = async (
+  notifyId: string,
+  toUserIds: ObjectId[],
+  event: string,
+  notificationData: INotificationData): Promise<void> => {
+  if (notificationData.from) {
+    toUserIds = toUserIds.filter(userId => !userId.equals(notificationData.from))
+  }
+  const users = await getNotificationUsers(toUserIds, event, notificationData);
+  const usersGroupByLanguage: Record<string, IUser[]> = _.groupBy(users, (user: IUser) => user.prefs?.language || 'en')
+  for (const [language, users] of Object.entries(usersGroupByLanguage)) {
+    const fcmTokens = getUniqFcmTokens(users)
+    if (_.isEmpty(fcmTokens))
+      continue;
+    const notification = await buildNotification(event, notificationData, language)
+    if (!notification)
+      continue;
+    const payload = {
+      notification,
+      data: {
+        event,
+        notifyId,
+        data: JSON.stringify(notificationData),
+        dt: new Date().toISOString()
+      }
+    }
+    await sendFcmWithRetry(event, users, fcmTokens, payload);
+  }
+}
+
+export const sendNotifyViaSocket = async(
+  notifyId: string,
+  toUserIds: ObjectId[],
+  event: string,
+  notificationData: INotificationData) => {
+  if (process.env.SOCKET_IO_NOTIFY) {
+    const errors = [];
+    // @ts-ignore
+    const appNs = global.io.of('/app');
+    const jsonData = JSON.stringify(notificationData);
+    for (const userId of toUserIds) {
+      try {
+        appNs.toUser(userId.toString()).emit(event, notifyId, jsonData);
+      } catch (e) {
+        errors.push({
+          userId,
+          error: e.message
+        })
+      }
+    }
+
+    if (errors.length) {
+      await Model.Storages.insertOne({
+        tag: 'notify.socket',
+        key: Date.now().toString(),
+        value: errors,
+        t: new Date()
       })
     }
-  } catch (e) {
-    getLogger().error(e.message, {fn: 'notification::apn', event})
   }
-
-  if (process.env.SOCKET_IO_NOTIFY) {
-    let error;
-    const userIds = users.map(u => u._id)
-    for (const userId of userIds) {
-      try {
-        // compatibility, delete later
-        // @obsolete
-        // @ts-ignore
-        global.io.of('/app').toUser(userId.toString()).emit(event, notifyId, JSON.stringify(data))
-      } catch (e) {
-        if (!error) error = e;
-      }
-    }
-    // just log the first error
-    if (error)
-      getLogger().error(error.message)
-  }
-  return response
 }

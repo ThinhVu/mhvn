@@ -18,6 +18,7 @@ import {IUserMetric} from "./metric/user-metric";
 import {IUser} from "./user";
 import {IVerification} from "./verification";
 import {IWAU} from "./metric/WAU";
+import {IStorage} from "./storage";
 
 export const CollNames = {
   AdminUsers: 'adminusers',
@@ -31,6 +32,7 @@ export const CollNames = {
   HealthChecks: 'healthchecks',
   I18ns: 'i18ns',
   KVs: 'kvs',
+  Storages: 'storages',
   MonthlyActiveUsers: 'maus',
   Notifications: 'notifications',
   Tasks: 'tasks',
@@ -74,6 +76,9 @@ export const Model = {
   },
   get KVs() {
     return getColl<IKV>(CollNames.KVs)
+  },
+  get Storages() {
+    return getColl<IStorage>(CollNames.Storages)
   },
   get MonthlyActiveUsers() {
     return getColl<IMAU>(CollNames.MonthlyActiveUsers)
