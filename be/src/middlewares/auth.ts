@@ -41,7 +41,7 @@ export function requireUser(req: Request<UserProps>, res: Response, next: Middle
     next(new ApiError("E_000", "Invalid user", 401))
     return
   }
-  const authUser = {_id: To.objectId(user._id)}
+  const authUser = {_id: To.oid(user._id)}
   if (req.locals)
     req.locals.user = authUser
   else

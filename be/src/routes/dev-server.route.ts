@@ -121,7 +121,7 @@ export default async function useDevServer(parentRouter: Router) {
 
   router.post('/notification/volatile-notify', $(async (req: Request) => {
     const {userIds, event, data} = await req.json()
-    const userObjectIds = _.map(userIds, id => DataParser.objectId(id))
+    const userObjectIds = _.map(userIds, id => DataParser.oid(id))
     return volatileNotifyUser(userObjectIds, event, data)
   }))
 

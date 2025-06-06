@@ -496,7 +496,7 @@ export default async function useUser(parentRouter: Router) {
   router.get('/profile/:id', {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $<IPublicUserInfo | IUser>(async (req: Request<UserProps>) => {
-    const userId = To.objectId(req.path_parameters.id)
+    const userId = To.oid(req.path_parameters.id)
     if (userId.toString() === req.locals.user._id.toString()) {
       const user: IUser = await Model.Users.findOne(
         {_id: req.locals.user._id},

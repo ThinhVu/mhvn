@@ -6,7 +6,7 @@ import {ObjectId} from "mongodb";
  * @param v input value
  * @param throwIfInvalid if true, an Error will be thrown. Otherwise, null will be returned.
  */
-const objectId = (v: any, throwIfInvalid = true): ObjectId => {
+const oid = (v: any, throwIfInvalid = true): ObjectId => {
   if (!v) {
     if (throwIfInvalid)
       throw new Error("Invalid object id")
@@ -34,7 +34,7 @@ const date = (v: any): Date => dayjs(v).toDate();
 const str = (v: any): string => (v && v.toString()) || "";
 
 export default {
-  objectId,
+  oid,
   number,
   bool,
   date,

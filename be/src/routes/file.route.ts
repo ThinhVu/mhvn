@@ -19,20 +19,20 @@ export default async function useFile(parentRouter: Router) {
     const {name, src, size, type, thumbnail, folderId} = await req.json()
     const file = await create({name, src, size, type, thumbnail, createdAt: new Date()})
     if (folderId)
-      await addFileToFolder(DataParser.objectId(folderId), file._id)
+      await addFileToFolder(DataParser.oid(folderId), file._id)
     return file
   }))
   router.put('/:id', {middlewares: [requireAdmin]}, $(async (req) => {
     const {id} = req.path_parameters
     const {change} = await req.json()
-    return update(DataParser.objectId(id), change)
+    return update(DataParser.oid(id), change)
   }))
   router.delete('/:id', {
     middlewares: [requireAdmin]
   }, $(async (req: Request<UserProps>) => {
     const {id} = req.path_parameters
-    const folderId = DataParser.objectId(req.query_parameters.folderId, false)
-    const fileId = DataParser.objectId(id)
+    const folderId = DataParser.oid(req.query_parameters.folderId, false)
+    const fileId = DataParser.oid(id)
     const data = await remove(fileId)
     if (folderId)
       await removeFileFromFolder(folderId, fileId)

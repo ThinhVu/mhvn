@@ -11,18 +11,18 @@ export function objectIdify(query: any) {
       const val = query[field];
       const realField = field.replace('$$ObjectId$$', '').replace('$$oid', '');
       if (typeof val === 'string') { // direct query from single object id x: "O0129301230123123aAbbqwdasdw"
-        query[realField] = To.objectId(query[field], false);
+        query[realField] = To.oid(query[field], false);
       } else {
         for (const key of Object.keys(val)) {
           switch (key) {
             case '$in':
               const arrayValue = val[key];
               for (let i = 0; i < arrayValue.length; i++) {
-                arrayValue[i] = To.objectId(arrayValue[i], false);
+                arrayValue[i] = To.oid(arrayValue[i], false);
               }
               break;
             case '$ne':
-              val[key] = To.objectId(val[key], false);
+              val[key] = To.oid(val[key], false);
               break;
             // TODO: support more operator
           }

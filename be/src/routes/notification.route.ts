@@ -23,7 +23,7 @@ export default async function useNotification(parentRouter: Router) {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req: Request<UserProps>) => {
     const {ids} = await req.json()
-    return seenNotifies(req.locals.user._id, _.map(ids, id => DataParser.objectId(id)))
+    return seenNotifies(req.locals.user._id, _.map(ids, id => DataParser.oid(id)))
   }))
 
   parentRouter.use('/notification', router)
