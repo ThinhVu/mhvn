@@ -12,7 +12,7 @@ COPY package*.json ./
 COPY yarn.lock ./
 
 # Install dependencies
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the app's source code
 COPY . .
@@ -37,7 +37,7 @@ COPY --from=builder /app/yarn.lock ./yarn.lock
 COPY --from=builder /app/build ./dist
 
 # Install production dependencies only
-RUN yarn install --prod
+RUN yarn install --frozen-lockfile --production
 
 # Expose the necessary port(s) for your app
 ENV API_PORT=4000
