@@ -1,14 +1,15 @@
-import {create, update, remove} from "../logic/file-system/file";
+import {create, update, remove, getUploadForm} from "../logic/file-system/file";
 import {addFileToFolder, removeFileFromFolder} from "../logic/file-system/folder";
 import DataParser from "../utils/data-parser";
 import {requireAdmin, requireUser, UserProps} from "../middlewares/auth";
 import $ from "../utils/safe-call";
 import {Router, Request} from 'hyper-express';
-import axios from "axios";
 import _ from 'lodash';
 import {rateLimitByUser} from "../middlewares/rate-limit";
 
 import {m2ms} from "../utils/date-time-util";
+import dayjs from "dayjs";
+import {getLogger} from "../utils/logger";
 
 export default async function useFile(parentRouter: Router) {
   console.log('[route] useFile')
@@ -42,10 +43,14 @@ export default async function useFile(parentRouter: Router) {
     middlewares: [requireUser, await rateLimitByUser({windowMs: m2ms(10), max: 60})]
   }, $(async (req) => {
     const {filename, mimeType} = req.query_parameters;
-    const folder = _.get(req.query_parameters, 'folder', 'user-data')
-    const url = `${process.env.FS_API_ENDPOINT}/upload-form?folder=${folder}&filename=${filename}&mimeType=${mimeType}&apiKey=${process.env.FS_API_KEY}`
-    const {data} = await axios.get(url)
-    return data
+    try {
+      const folder = _.get(req.query_parameters, 'folder', `user-data/${dayjs().format('YYMM')}`)
+      const uploadForm = await getUploadForm(filename, mimeType, folder)
+      return uploadForm
+    } catch (e) {
+      getLogger().error(e.message, {fn: '/file/upload-form', filename, mimeType})
+      throw e;
+    }
   }))
 
   parentRouter.use('/file', router)

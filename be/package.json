@@ -17,6 +17,7 @@
     "@socket.io/redis-adapter": "^8.1.0",
     "@tvux/hmmjs": "^0.69.420",
     "apn": "^2.2.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.6.2",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.2",
