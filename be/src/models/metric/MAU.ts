@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
-import {Indexed} from "../../../utils/types";
+import {Indexed} from "../../utils/types";
 
-export type IDAU = Partial<{
+export type IMAU = Partial<{
   _id: ObjectId;
   n: number;
   t: Indexed<Date>;

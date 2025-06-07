@@ -3,7 +3,7 @@ import {parseAuthorization} from "../utils/auth-util";
 import To from "../utils/data-parser";
 import {ObjectId} from "mongodb";
 import {type Request, type Response, type MiddlewareNext} from "hyper-express";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 interface IAuthUser {
   _id: ObjectId;

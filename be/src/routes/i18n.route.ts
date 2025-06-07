@@ -4,7 +4,7 @@ import {Router} from 'hyper-express';
 import {rateLimitByIp} from "../middlewares/rate-limit";
 
 import {m2ms} from "../utils/date-time-util";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 export default async function useI18n(parentRouter: Router) {
   console.log('[route] useI18n')

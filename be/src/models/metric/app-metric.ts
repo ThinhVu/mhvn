@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {Indexed} from "../../../utils/types";
+import {Indexed} from "../../utils/types";
 
 export type IAppMetric = Partial<{
   _id: ObjectId;

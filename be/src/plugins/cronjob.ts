@@ -3,7 +3,7 @@ import {snapshot as appMetricSnapshot} from "../logic/metric/app-metric";
 import {snapshot as userMetricSnapshot} from "../logic/metric/user-metric";
 import appHook from "../logic/hooks";
 import {getLogger} from "../utils/logger";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 // https://crontab.guru
 export default async function cronjob() {

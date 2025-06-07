@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {Request} from "hyper-express";
-import {IUser} from "../db/models/user";
+import {IUser} from "../models/user";
 import {getLogger} from "./logger";
 
 export interface IAuthData {

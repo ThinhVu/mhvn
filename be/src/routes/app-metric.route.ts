@@ -2,7 +2,7 @@ import {requireUser} from "../middlewares/auth";
 import {getAppMetricNow} from "../logic/metric/app-metric";
 import $ from "../utils/safe-call";
 import {Router} from 'hyper-express';
-import {Model} from "../db/models";
+import {Model} from "../models";
 import dayjs from "dayjs";
 
 export default async function useAppMetric(parentRouter: Router) {

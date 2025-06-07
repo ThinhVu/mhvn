@@ -1,5 +1,5 @@
 import {encrypt, decrypt} from '../utils/crypto'
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 export async function getAll() {
   const kvs = await Model.KVs.find().toArray()

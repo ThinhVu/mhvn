@@ -1,7 +1,7 @@
 import appHook from "./index";
 import {ObjectId} from "mongodb";
 import {logLogin, logLogout} from "../metric/user-login-history"
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 
 export default async function userHooks() {
   appHook.on('user:online', async function (uid: ObjectId) {

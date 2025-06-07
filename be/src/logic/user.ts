@@ -1,9 +1,9 @@
 import _ from 'lodash'
-import {Gender, IPublicUserInfo, IUser} from "../db/models/user";
+import {Gender, IPublicUserInfo, IUser} from "../models/user";
 import {ApiError} from "../utils/common-util";
 import {EmailRegex} from "../constants/regex";
 import {ObjectId} from "mongodb";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 const usernameCharsetMap = (function () {
   const output = {};

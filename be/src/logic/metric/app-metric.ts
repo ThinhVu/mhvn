@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 
 export async function getAppMetricNow() {
   return {

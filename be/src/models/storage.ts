@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {HashedIndex} from "../../utils/types";
+import {HashedIndex} from "../utils/types";
 
 export type IStorage = Partial<{
    _id: ObjectId;

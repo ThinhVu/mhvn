@@ -10,9 +10,9 @@ import {snapshot} from "../logic/metric/user-metric";
 import {ApiError} from "../utils/common-util";
 import {getRandomSubarray, randomNumberInRange} from "../utils/random-util";
 import {delay, m2ms} from "../utils/date-time-util";
-import {Model} from "../db/models";
+import {Model} from "../models";
 import {defaultUserInfo} from "../logic/user";
-import {IVerification, VrfType} from "../db/models/verification";
+import {IVerification, VrfType} from "../models/verification";
 
 async function initUser(uptimeByDay: number) {
   console.log('[dev-server] init user')

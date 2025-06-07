@@ -1,6 +1,6 @@
-import {IFile} from '../../db/models/file-system/file';
+import {IFile} from '../../models/file-system/file';
 import {ObjectId} from "mongodb";
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 import {getLogger} from "../../utils/logger";
 import S3 from "../../utils/s3";
 

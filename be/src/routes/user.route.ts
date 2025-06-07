@@ -16,7 +16,7 @@ import {
   validatePassword
 } from '../logic/user';
 import {ApiError} from "../utils/common-util";
-import {IVerification, VrfType} from "../db/models/verification";
+import {IVerification, VrfType} from "../models/verification";
 import {genToken, parseAuthorization} from "../utils/auth-util";
 import To from "../utils/data-parser";
 import {buildEmailPayload, sendEmail} from "../utils/email-util";
@@ -27,10 +27,10 @@ import i18n from "../i18n";
 import uuid from "time-uuid";
 import {rateLimitByIp, rateLimitByUser} from "../middlewares/rate-limit";
 import {sendOTP} from "../utils/stringee";
-import {IPublicUserInfo, IUser} from "../db/models/user";
+import {IPublicUserInfo, IUser} from "../models/user";
 import {randomNumberInRange} from "../utils/random-util";
 import {m2ms} from "../utils/date-time-util";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 interface CreateVerifyCodeResult {
   issueDate: Date,

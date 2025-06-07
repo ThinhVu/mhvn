@@ -2,7 +2,7 @@ import {requireUser} from "../middlewares/auth";
 import $ from "../utils/safe-call";
 import {Router} from "hyper-express";
 import {getDAUNow, getMAUNow, getWAUNow} from "../logic/metric/user-metric";
-import {Model} from "../db/models";
+import {Model} from "../models";
 import dayjs from "dayjs";
 
 export default async function useUserMetric(parentRouter: Router) {

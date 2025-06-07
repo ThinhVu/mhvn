@@ -2,7 +2,7 @@ import {requireAdmin} from "../middlewares/auth"
 import hmmExecFactory from '@tvux/hmmjs'
 import jsonFn from 'json-fn'
 import {Request, Response} from "hyper-express"
-import {Model} from "../db/models"
+import {Model} from "../models"
 import To from "../utils/data-parser"
 
 export function objectIdify(query: any) {

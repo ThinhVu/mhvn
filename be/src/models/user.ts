@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {Indexed} from "../../utils/types";
+import {Indexed} from "../utils/types";
 
 export enum Gender {
   Male = 'Male',

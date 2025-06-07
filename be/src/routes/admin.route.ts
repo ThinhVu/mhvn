@@ -5,7 +5,7 @@ import {ApiError} from "../utils/common-util";
 import {Router} from "hyper-express";
 import {rateLimitByIp} from "../middlewares/rate-limit";
 import {m2ms} from "../utils/date-time-util";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 export default async function useAdmin(parentRouter: Router) {
   console.log('[route] useAdmin')

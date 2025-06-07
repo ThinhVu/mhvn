@@ -1,6 +1,6 @@
-import patches from "../db/patches";
+import patches from "../migrations";
 import {getVersion} from "../utils/common-util";
-import {Model} from "../db/models";
+import {Model} from "../models";
 
 export default async function migrate() {
   console.log('[mongodb] [migrate] Migrate database')

@@ -8,11 +8,11 @@ import {delay, s2ms} from "../../utils/date-time-util";
 import {alert} from "../../utils/rt-alert";
 import {getLogger} from "../../utils/logger";
 import {getValue} from "../kv";
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 import {removeFcmTokenForDevice} from "../user";
 import {getTokenUserIdMap} from "./index";
 import { ObjectId } from "mongodb";
-import {IUser} from "../../db/models/user";
+import {IUser} from "../../models/user";
 
 const app = admin.initializeApp({credential})
 const fcm = app.messaging()

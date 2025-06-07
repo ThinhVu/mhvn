@@ -6,7 +6,7 @@ import {createAdapter as createMongoDbAdapter} from '@socket.io/mongo-adapter'
 import {createClient} from "redis"
 import appHook from "../logic/hooks"
 import * as process from "process";
-import {Model} from "../db/models";
+import {Model} from "../models";
 import {getColl} from "./mongodb";
 
 /**

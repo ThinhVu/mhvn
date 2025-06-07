@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import {ObjectId} from "mongodb";
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 
 export function logLogin(uid: ObjectId, atDay?: Date) {
   atDay = atDay || new Date()

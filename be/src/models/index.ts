@@ -1,4 +1,4 @@
-import {getColl} from "../../plugins/mongodb";
+import {getColl} from "../plugins/mongodb";
 import {IAdminUser} from "./admin-user";
 import {IAnnouncement} from "./announcement";
 import {IAPIMetric} from "./metric/api-metric";

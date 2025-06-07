@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import {ObjectId} from "mongodb";
-import {INotification} from "../../db/models/notification";
-import {Model} from "../../db/models";
+import {INotification} from "../../models/notification";
+import {Model} from "../../models";
 import {buildNotification} from "./notification-builder";
 import {INotificationData} from "../../constants/app-types";
 import {sendFcmWithRetry} from "./fcm";
-import {IUser} from "../../db/models/user";
+import {IUser} from "../../models/user";
 
 export const getNotifications = async (uid: ObjectId, p?: number): Promise<any> => {
   p = +p || 1

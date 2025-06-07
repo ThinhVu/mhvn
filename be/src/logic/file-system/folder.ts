@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import {IFolder} from "../../db/models/file-system/folder";
+import {IFolder} from "../../models/file-system/folder";
 import {ObjectId} from "mongodb";
-import {CollNames, Model} from "../../db/models";
+import {CollNames, Model} from "../../models";
 
 export const getFolderTree = async () => {
   const folders = await Model.Folders.find({}, {projection: {files: 0}}).toArray()

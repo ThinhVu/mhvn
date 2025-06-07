@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import {getLogger} from "../../utils/logger";
-import {Model} from "../../db/models";
+import {Model} from "../../models";
 
 export async function snapshot(atDay?: Date) {
   const atDayJs = dayjs(atDay);
