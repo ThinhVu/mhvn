@@ -1,45 +1,40 @@
 # MHVN
 
-MHVN stand for MongoDB, HyperExpress, Vue, NodeJS. It's an all-in-one solution for building monolith web app with Vue3, HyperExpress, MongoDB, NodeJS.
+MHVN stands for MongoDB, HyperExpress, Vue, Node.js. It's an all-in-one solution for building monolith web app with Vue3, HyperExpress, MongoDB, Node.js.
 
 ### Backend (be)
 - mongodb with predefined collections (User, DAU, DbMigration, HealthCheck, API Metric, FileStorage, SystemConfig, Tasks, Notification, Announcement).
 - Built-in database migration workflow.
-- Built-in authentication using json web token.
+- Built-in authentication using JSON web token.
 - User API: predefined api to create user, modifier user profile, forgot password, recover password via email, delete account request & cancel.
-- Hmm API: query mongoose directly from frontend side.
+- Hmm API: query mongoose directly from the frontend side.
 - System config API: shared storage for both fe + be.
-- Notification api
+- Notification API
 - Built-in API metric: meter api call, average ms spent on each API call.
 - Built-in cronjob workflow.
 - Built-in long task workflow.
 - App hooks.
-- Realtime: SocketIO + Redis
-- Tracing: jaeger (coming soon).
+- Realtime: SocketIO + Redis + Cluster
+- Distributed logging support (winston + axiom)
+- Storage service: S3
 - Email sender
-- Docker script to built & publish container.
+- Docker script to build & publish container.
 - GitHub action auto build on release
-
-### File Server (https://github.com/ThinhVu/file-server)
-- mongodb gridfs, s3
-- detect media file
-- generate image thumbnail
 
 ### Frontend (fe)
 - vue3 + vite + UnoCSS
 - vitest (coming soon)
-- predefined CSS rules (of course you can use another plugins)
+- predefined CSS rules (of course, you can use another plugin)
 - predefined Vue components: input, load data, data table, dialog service, message box, notification, image slide, image viewer, pulse block, tooltip, progress bar, spacer, icon, date time format, imgx, paging,...
 - predefined template: admin dashboard
 - built-in utility class to work with provided backend API.
-- Hmm client: query mongoose directly from frontend sidee.
+- Hmm client: query mongoose directly from the front-end side.
 - hook
 - caching
 - file uploader
-- tracing: jeager (coming soon)
-- log pipe: reading backend log directly from frontend in realtime.
+- log pipe: reading backend log directly from the frontend in realtime.
 - view logger
-- dashboard with API metric in chart or table.
+- dashboard with API metric in a chart or table.
 - built-in authentication (jsonwebtoken).
 - and a lot more...
 
